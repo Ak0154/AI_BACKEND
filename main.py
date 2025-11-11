@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-load_dotenv() 
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -14,7 +15,6 @@ async def lifespan(app: FastAPI):
     await init_db()
     print("Database connection initialized.")
     yield
-
     print("Application shutdown...")
 
 app = FastAPI(
@@ -24,20 +24,16 @@ app = FastAPI(
     lifespan=lifespan  
 )
 
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://127.0.0.1:5500",  
-    "null", 
-]
+# ✅ Allow all origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],           # Allow all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],           # Allow all HTTP methods
+    allow_headers=["*"],           # Allow all headers
 )
 
+# Include routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(progress.router, prefix="/progress")
 
